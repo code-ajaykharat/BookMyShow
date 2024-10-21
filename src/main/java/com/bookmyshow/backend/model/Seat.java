@@ -1,4 +1,16 @@
 package com.bookmyshow.backend.model;
 
-public class Seat {
+import jakarta.persistence.Entity;
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
+@Entity
+public class Seat extends BaseModel{
+    private String number;
+    private SeatType seatType;
+    private int row;
+    private int col;
+    private Screen screen;
 }

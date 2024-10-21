@@ -1,7 +1,7 @@
 package com.bookmyshow.backend.constant;
 
-public enum ShowSeatStatus {
-    AVAILABLE,
+public enum BookingStatus {
     BOOKED,
-    BLOCKED
+    CANCELLED,
+    PENDING
 }
