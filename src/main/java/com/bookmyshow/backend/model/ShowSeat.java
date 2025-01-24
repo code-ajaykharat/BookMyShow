@@ -2,17 +2,23 @@ package com.bookmyshow.backend.model;
 
 import com.bookmyshow.backend.constant.ShowSeatStatus;
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
 @Entity
 public class ShowSeat extends BaseModel{
-    @OneToOne
+    @ManyToOne
     private Show show;
-    @OneToOne
+    @ManyToOne
     private Seat seat;
+    @Enumerated(EnumType.STRING)
     private ShowSeatStatus showSeatStatus;
+    private LocalDateTime blockedAt;
 }

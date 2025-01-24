@@ -13,7 +13,7 @@ import java.util.List;
 public class Screen extends BaseModel{
     private String name;
     private int capacity;
-    @OneToMany
+    @OneToMany(mappedBy = "screen", cascade = CascadeType.ALL)
     private List<Seat> seats;
     @Enumerated(EnumType.STRING)
     @ElementCollection

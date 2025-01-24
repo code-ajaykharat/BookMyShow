@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 
 @Setter
 @Getter
-@Entity
 @MappedSuperclass
 public class BaseModel {
     @Id
