@@ -8,9 +8,9 @@
         <version>3.3.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.bookmyshow</groupId>
+    <groupId>com.bookmyshow.backend</groupId>
     <artifactId>BookMyShow</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>BookMyShow</name>
     <description>BookMyShow</description>
     <url/>
