@@ -1,6 +1,7 @@
 package com.bookmyshow.backend.model;
 
 import com.bookmyshow.backend.constant.Feature;
+import com.bookmyshow.backend.constant.Language;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,4 +17,7 @@ public class Movie extends BaseModel{
     @Enumerated(EnumType.STRING)
     @ElementCollection
     private List<Feature> features;
+    @Enumerated(EnumType.STRING)
+    @ElementCollection
+    private List<Language> languages;
 }

@@ -15,6 +15,7 @@ import com.bookmyshow.backend.repository.ShowSeatRepository;
 import com.bookmyshow.backend.repository.UserRepository;
 import com.bookmyshow.backend.service.BookTicketService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +42,8 @@ public class BookTicketServiceImpl implements BookTicketService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.SERIALIZABLE)
+    //@Transactional(isolation = Isolation.SERIALIZABLE)
+    @Transactional
     public Booking bookTicket(int userId, int showId, List<Integer> showSeatIds) {
         //get the user
         Optional<User> user = userRepository.findById(userId);
@@ -54,7 +56,7 @@ public class BookTicketServiceImpl implements BookTicketService {
             throw new ShowNotFoundException("Show not found");
         }
         //get the show seats
-        List<ShowSeat> showSeats = showSeatRepository.findAllById(showSeatIds);
+        List<ShowSeat> showSeats = showSeatRepository.findAllByIdWithLock(showSeatIds);
         if (showSeats.size() != showSeatIds.size()) {
             throw new ShowSeatNotFoundException("Show seat not found");
         }
@@ -68,6 +70,7 @@ public class BookTicketServiceImpl implements BookTicketService {
         List<ShowSeat> savedShowSeats = new ArrayList<>();
         for(ShowSeat showSeat : showSeats) {
             showSeat.setShowSeatStatus(ShowSeatStatus.BLOCKED);
+            showSeat.setBlockedAt(LocalDateTime.now());
             savedShowSeats.add(showSeatRepository.save(showSeat));
         }
 
@@ -75,10 +78,44 @@ public class BookTicketServiceImpl implements BookTicketService {
         Booking booking = new Booking();
         booking.setUser(user.get());
         booking.setShowSeats(savedShowSeats);
-        booking.setAmount(100);
+        booking.setAmount(100);//you can calculate the amount based on the show and seatype
         booking.setBookingTime(LocalDateTime.now());
         booking.setBookingStatus(BookingStatus.PENDING);
         booking.setPayments(new ArrayList<>());
         return bookingRepository.save(booking);
     }
+
+    @Scheduled(fixedRate = 60000) // Every 1 minute
+    @Transactional
+    //This will be used to release the expired blocked after 15 minutes and save it to DB
+    public void releaseExpiredBlockedSeats() {
+        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(15);
+
+        // 1. Fetch all seats from DB
+        List<ShowSeat> allSeats = showSeatRepository.findAll();
+
+        // 2. Filter manually: only BLOCKED and expired
+        List<ShowSeat> expiredBlockedSeats = new ArrayList<>();
+        for (ShowSeat seat : allSeats) {
+            if (seat.getShowSeatStatus() == ShowSeatStatus.BLOCKED) {
+                if (seat.getBlockedAt() != null && seat.getBlockedAt().isBefore(cutoff)) {
+                    expiredBlockedSeats.add(seat);
+                }
+            }
+        }
+
+        // 3. Unblock the expired seats
+        for (ShowSeat seat : expiredBlockedSeats) {
+            seat.setShowSeatStatus(ShowSeatStatus.AVAILABLE);
+            seat.setBlockedAt(null);
+        }
+
+        // 4. Save updated seats back to DB
+        showSeatRepository.saveAll(expiredBlockedSeats);
+
+        if (!expiredBlockedSeats.isEmpty()) {
+            System.out.println("Unblocked " + expiredBlockedSeats.size() + " expired seats");
+        }
+    }
+
 }

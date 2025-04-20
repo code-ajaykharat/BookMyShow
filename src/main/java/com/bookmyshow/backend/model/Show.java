@@ -1,5 +1,6 @@
 package com.bookmyshow.backend.model;
 
+import com.bookmyshow.backend.constant.Language;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -21,4 +22,5 @@ public class Show extends BaseModel {
     @ManyToOne
     private Screen screen;
     private int duration;
+    private Language language;
 }

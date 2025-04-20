@@ -17,7 +17,7 @@ import static com.bookmyshow.backend.constant.ResponseStatus.SUCCESS;
 public class BookTicketController {
     private BookTicketService bookTicketService;
 
-    @Autowired
+    @Autowired // best for unit testing and immutability
     public BookTicketController (BookTicketService bookTicketService) {
         this.bookTicketService = bookTicketService;
     }
